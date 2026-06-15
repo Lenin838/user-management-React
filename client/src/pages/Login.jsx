@@ -32,7 +32,11 @@ function Login() {
 
       toast.success("Login successful")
 
-      navigate('/')
+      if (data.user.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
 
     } catch (error) {
 

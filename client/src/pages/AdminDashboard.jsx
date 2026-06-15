@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 
 function AdminDashboard() {
 
-  const { token } = useSelector((state) => state.auth);
+  const { adminToken } = useSelector((state) => state.auth);
 
 
   const [selectedUser, setSelectedUser] = useState(null);
@@ -21,17 +21,20 @@ function AdminDashboard() {
 
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const fetchUsers = async () => {
     try {
 
-      const res = await API.get(`/users?search=${search}`, {
+      const res = await API.get(`/users?search=${search}&page=${page}&limit=5`, {
         headers: {
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${adminToken}`
         }
       });
 
-      setUsers(res.data);
+      setUsers(res.data.users);
+      setTotalPages(res.data.totalPages);
 
     } catch (error) {
       console.log(error);
@@ -39,8 +42,12 @@ function AdminDashboard() {
   };
 
   useEffect(() => {
-    fetchUsers();
+    setPage(1);
   }, [search]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [search, page]);
 
   const handleDelete = (id) => {
     setUserToDelete(id);
@@ -51,7 +58,7 @@ function AdminDashboard() {
     try {
       await API.delete(`/users/${userToDelete}`, {
         headers: {
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${adminToken}`
         }
       });
 
@@ -82,7 +89,7 @@ function AdminDashboard() {
         { name, email },
         {
           headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${adminToken}`
           }
         }
       );
@@ -200,6 +207,27 @@ function AdminDashboard() {
 
           </table>
 
+        </div>
+
+        {/* Pagination Controls */}
+        <div className="flex justify-between items-center mt-6">
+          <button
+            disabled={page === 1}
+            onClick={() => setPage((prev) => prev - 1)}
+            className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 disabled:opacity-50 transition cursor-pointer"
+          >
+            Previous
+          </button>
+          <span className="text-gray-700 font-semibold">
+            Page {page} of {totalPages || 1}
+          </span>
+          <button
+            disabled={page === totalPages || totalPages === 0}
+            onClick={() => setPage((prev) => prev + 1)}
+            className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 disabled:opacity-50 transition cursor-pointer"
+          >
+            Next
+          </button>
         </div>
 
       </div>

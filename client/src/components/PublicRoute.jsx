@@ -3,10 +3,14 @@ import { Navigate } from "react-router-dom";
 
 function PublicRoute({ children }) {
 
-  const { user } = useSelector((state) => state.auth);
+  const { user, admin } = useSelector((state) => state.auth);
 
   if (user) {
     return <Navigate to="/" />;
+  }
+
+  if (admin) {
+    return <Navigate to="/admin" />;
   }
 
   return children;

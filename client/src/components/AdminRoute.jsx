@@ -3,10 +3,10 @@ import { Navigate } from "react-router-dom";
 
 function AdminRoute({ children }) {
 
-  const { user } = useSelector((state) => state.auth);
+  const { admin } = useSelector((state) => state.auth);
 
-  if (!user || user.role !== "admin") {
-    return <Navigate to="/" />;
+  if (!admin) {
+    return <Navigate to="/login" />;
   }
 
   return children;

@@ -1,7 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const userFromStorage = localStorage.getItem("user")
-  ? JSON.parse(localStorage.getItem("user"))
+const userFromStorage = sessionStorage.getItem("user")
+  ? JSON.parse(sessionStorage.getItem("user"))
+  : null;
+
+const adminFromStorage = sessionStorage.getItem("admin")
+  ? JSON.parse(sessionStorage.getItem("admin"))
   : null;
 
 const authSlice = createSlice({
@@ -9,33 +13,63 @@ const authSlice = createSlice({
 
   initialState: {
     user: userFromStorage,
-    token: localStorage.getItem("token") || null,
+    token: sessionStorage.getItem("token") || null,
+    admin: adminFromStorage,
+    adminToken: sessionStorage.getItem("adminToken") || null,
     count: 0
   },
 
   reducers: {
 
     loginSuccess: (state, action) => {
-      state.user = action.payload.user;
-      state.token = action.payload.token;
+      const { user, token } = action.payload;
+      if (user.role === "admin") {
+        state.admin = user;
+        state.adminToken = token;
 
-      localStorage.setItem("user", JSON.stringify(action.payload.user));
-      localStorage.setItem("token", action.payload.token);
+        sessionStorage.setItem("admin", JSON.stringify(user));
+        sessionStorage.setItem("adminToken", token);
+      } else {
+        state.user = user;
+        state.token = token;
+
+        sessionStorage.setItem("user", JSON.stringify(user));
+        sessionStorage.setItem("token", token);
+      }
     },
 
-    logout: (state) => {
-      state.user = null;
-      state.token = null;
-
-      localStorage.removeItem("user");
-      localStorage.removeItem("token");
+    logout: (state, action) => {
+      const role = action.payload;
+      if (role === "admin") {
+        state.admin = null;
+        state.adminToken = null;
+        sessionStorage.removeItem("admin");
+        sessionStorage.removeItem("adminToken");
+      } else if (role === "user") {
+        state.user = null;
+        state.token = null;
+        sessionStorage.removeItem("user");
+        sessionStorage.removeItem("token");
+      } else {
+        state.user = null;
+        state.token = null;
+        state.admin = null;
+        state.adminToken = null;
+        sessionStorage.removeItem("user");
+        sessionStorage.removeItem("token");
+        sessionStorage.removeItem("admin");
+        sessionStorage.removeItem("adminToken");
+      }
     },
     changeName:(state,action)=>{
-      state.user.name = action.payload;
+      if (state.user) {
+        state.user.name = action.payload;
+        sessionStorage.setItem("user", JSON.stringify(state.user));
+      }
     }
   }
 });
 
-export const { loginSuccess, logout,changeName } = authSlice.actions;
+export const { loginSuccess, logout, changeName } = authSlice.actions;
 
 export default authSlice.reducer;
