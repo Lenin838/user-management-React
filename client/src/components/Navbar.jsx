@@ -124,14 +124,6 @@ function Navbar() {
               >
                 Profile
               </Link>
-              <Link
-                to="/about"
-                className="hover:text-gray-300 transition"
-              >
-                About
-              </Link>
-
-
 
               <button
                 onClick={handleLogoutUser}

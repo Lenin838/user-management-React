@@ -61,15 +61,9 @@ const authSlice = createSlice({
         sessionStorage.removeItem("adminToken");
       }
     },
-    changeName:(state,action)=>{
-      if (state.user) {
-        state.user.name = action.payload;
-        sessionStorage.setItem("user", JSON.stringify(state.user));
-      }
-    }
   }
 });
 
-export const { loginSuccess, logout, changeName } = authSlice.actions;
+export const { loginSuccess, logout } = authSlice.actions;
 
 export default authSlice.reducer;
